@@ -83,7 +83,6 @@ func (t *GarlicTransport) loadKeys() (*sam3.I2PKeys, error) {
 			if err != nil {
 				return err
 			}
-			//i2pName := strings.Replace(filepath.Base(file.Name()), ".i2pkeys", "", 1)
 			privKey, err := sam3.LoadKeysIncompat(file)
 			if err != nil {
 				return err
@@ -120,9 +119,16 @@ func (t *GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
 		return nil, fmt.Errorf("failed to generate I2PMultiaddr")
 	}
 
+	sk, pk, err := crypto.GenerateEd25519Key(rand.Reader)
+	if err != nil {
+		return nil, err
+	}
+
 	listener := GarlicListener{
 		key:       garlicAddr,
 		laddr:     laddr,
+		lPrivKey:  sk,
+		lPubKey:   pk,
 		transport: t,
 	}
 
@@ -131,8 +137,7 @@ func (t *GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
 		return nil, err
 	}
 
-    tmpListener, err := listener.session.Listen()
-	listener.StreamListener = *tmpListener
+	listener.StreamListener, err = listener.session.Listen()
 	if err != nil {
 		return nil, err
 	}

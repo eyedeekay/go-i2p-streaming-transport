@@ -5,6 +5,7 @@ import (
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	"net"
 
+	crypto "github.com/libp2p/go-libp2p-crypto"
 	tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr-net"
@@ -12,11 +13,15 @@ import (
 
 // GarlicListener implements go-libp2p-transport's Listener interface
 type GarlicListener struct {
-    sam3.StreamListener
-	key       i2pma.I2PMultiaddr
-	laddr     ma.Multiaddr
-	session   *sam3.StreamSession
-	transport tpt.Transport
+	*sam3.StreamListener
+	key      i2pma.I2PMultiaddr
+	laddr    ma.Multiaddr
+	lPrivKey crypto.PrivKey
+	lPubKey  crypto.PubKey
+
+	session *sam3.StreamSession
+	//rPubKey   crypto.PubKey
+	transport *GarlicTransport
 }
 
 // Accept blocks until a connection is received returning
@@ -35,6 +40,8 @@ func (l *GarlicListener) Accept() (tpt.Conn, error) {
 		Conn:      conn,
 		transport: l.transport,
 		laddr:     &l.laddr,
+		lPrivKey:  l.lPrivKey,
+		lPubKey:   l.lPubKey,
 		raddr:     raddr.(i2pma.I2PMultiaddr),
 	}
 	return &garlicConn, nil
@@ -42,7 +49,13 @@ func (l *GarlicListener) Accept() (tpt.Conn, error) {
 
 // Close shuts down the listener
 func (l *GarlicListener) Close() error {
-	return l.StreamListener.Close()
+	if err := l.StreamListener.Close(); err != nil {
+		return err
+	}
+	if err := l.session.Close(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Addr returns the net.Addr interface which represents

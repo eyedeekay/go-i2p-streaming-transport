@@ -18,12 +18,12 @@ import (
 type GarlicDialer struct {
 	garlicConn *GarlicConn
 
-	laddr      *ma.Multiaddr
-	lPrivKey   crypto.PrivKey
-	lPubKey    crypto.PubKey
+	laddr    *ma.Multiaddr
+	lPrivKey crypto.PrivKey
+	lPubKey  crypto.PubKey
 
-	transport  *GarlicTransport
-	rPubKey    crypto.PubKey
+	transport *GarlicTransport
+	rPubKey   crypto.PubKey
 }
 
 // Dial connects to the specified multiaddr and returns
