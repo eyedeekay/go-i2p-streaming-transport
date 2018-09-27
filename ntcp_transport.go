@@ -69,7 +69,7 @@ func (t *GarlicTransport) Proxy() bool {
 	return false
 }
 
-// loadKeys loads keys into our keys map from files in the keys direcI2Py
+// loadKeys loads keys into our keys from files in the keys directory
 func (t *GarlicTransport) loadKeys() (*sam3.I2PKeys, error) {
 	var keys sam3.I2PKeys
 	absPath, err := filepath.EvalSymlinks(t.keysDir)
@@ -131,7 +131,8 @@ func (t *GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
 		return nil, err
 	}
 
-	listener.listener, err = listener.session.Listen()
+    tmpListener, err := listener.session.Listen()
+	listener.StreamListener = *tmpListener
 	if err != nil {
 		return nil, err
 	}

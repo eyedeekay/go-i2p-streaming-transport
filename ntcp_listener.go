@@ -12,10 +12,10 @@ import (
 
 // GarlicListener implements go-libp2p-transport's Listener interface
 type GarlicListener struct {
+    sam3.StreamListener
 	key       i2pma.I2PMultiaddr
 	laddr     ma.Multiaddr
 	session   *sam3.StreamSession
-	listener  net.Listener
 	transport tpt.Transport
 }
 
@@ -23,7 +23,7 @@ type GarlicListener struct {
 // go-libp2p-transport's Conn interface or an error if
 // something went wrong
 func (l *GarlicListener) Accept() (tpt.Conn, error) {
-	conn, err := l.listener.Accept()
+	conn, err := l.StreamListener.Accept()
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (l *GarlicListener) Accept() (tpt.Conn, error) {
 
 // Close shuts down the listener
 func (l *GarlicListener) Close() error {
-	return l.listener.Close()
+	return l.StreamListener.Close()
 }
 
 // Addr returns the net.Addr interface which represents
