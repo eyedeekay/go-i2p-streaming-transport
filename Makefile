@@ -1,0 +1,19 @@
+
+#GOPATH=$(PWD)/.go
+
+#PATH+=$(GOPATH)/bin
+
+echo:
+	@echo $(GOPATH)
+
+gx:
+	go get github.com/whyrusleeping/gx
+	go get github.com/whyrusleeping/gx-go
+
+deps: gx
+	gx --verbose install --global
+	gx-go rewrite
+
+publish:
+	gx-go rewrite --undo
+
