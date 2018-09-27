@@ -5,6 +5,7 @@ import (
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	"strings"
 
+	crypto "github.com/libp2p/go-libp2p-crypto"
 	net "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	peerstore "github.com/libp2p/go-libp2p-peerstore"
@@ -17,7 +18,10 @@ import (
 type GarlicDialer struct {
 	garlicConn *GarlicConn
 	laddr      *ma.Multiaddr
+	lPrivKey   crypto.PrivKey
+	lPubKey    crypto.PubKey
 	transport  *GarlicTransport
+	rPubKey    crypto.PubKey
 }
 
 // Dial connects to the specified multiaddr and returns
@@ -34,7 +38,10 @@ func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
 	garlicConn := GarlicConn{
 		transport: tpt.Transport(d.transport),
 		laddr:     d.laddr,
+		lPrivKey:  d.lPrivKey,
+		lPubKey:   d.lPubKey,
 		raddr:     raddr,
+		rPubKey:   d.rPubKey,
 	}
 	if garlicAddress != "" {
 		split := strings.Split(garlicAddress, ":")

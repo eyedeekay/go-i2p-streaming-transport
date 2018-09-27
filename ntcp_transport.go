@@ -2,6 +2,7 @@ package ipfsi2pntcp
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/eyedeekay/sam3"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	crypto "github.com/libp2p/go-libp2p-crypto"
 	net "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	tpt "github.com/libp2p/go-libp2p-transport"
@@ -96,9 +98,15 @@ func (t *GarlicTransport) loadKeys() (*sam3.I2PKeys, error) {
 
 // Dialer creates and returns a go-libp2p-transport Dialer
 func (t *GarlicTransport) Dialer(laddr ma.Multiaddr) (net.Dialer, error) {
+	sk, pk, err := crypto.GenerateEd25519Key(rand.Reader)
+	if err != nil {
+		return nil, err
+	}
 	dialer := GarlicDialer{
 		garlicConn: t.garlicDialer.garlicConn,
 		laddr:      &laddr,
+		lPrivKey:   sk,
+		lPubKey:    pk,
 		transport:  t,
 	}
 	return dialer, nil

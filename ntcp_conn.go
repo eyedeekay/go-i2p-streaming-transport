@@ -22,17 +22,20 @@ type GarlicConn struct {
 
 	transport tpt.Transport
 	laddr     *ma.Multiaddr
-	raddr     i2pma.I2PMultiaddr
-	session   *sam3.StreamSession
+	lPrivKey  crypto.PrivKey
+	lPubKey   crypto.PubKey
+
+	raddr   i2pma.I2PMultiaddr
+	rPubKey crypto.PubKey
+	session *sam3.StreamSession
 }
 
 // Close ends a SAM session associated with a transport
 func (c GarlicConn) Close() error {
-	//c.transport.Close()
 	err := c.session.Close()
-    if err == nil {
-        c.session = nil
-    }
+	if err == nil {
+		c.session = nil
+	}
 	return err
 }
 
@@ -63,23 +66,21 @@ func (c GarlicConn) IsClosed() bool {
 }
 
 func (c GarlicConn) LocalPeer() peer.ID {
-	var p peer.ID
-	return p
+	lpeer, _ := peer.IDFromPrivateKey(c.LocalPrivateKey())
+	return lpeer
 }
 
 func (c GarlicConn) LocalPrivateKey() crypto.PrivKey {
-	var pk crypto.PrivKey
-	return pk
+	return c.lPrivKey
 }
 
 func (c GarlicConn) RemotePeer() peer.ID {
-	var p peer.ID
-	return p
+	rpeer, _ := peer.IDFromPublicKey(c.RemotePublicKey())
+	return rpeer
 }
 
 func (c GarlicConn) RemotePublicKey() crypto.PubKey {
-	var p crypto.PubKey
-	return p
+	return c.rPubKey
 }
 
 func (c GarlicConn) OpenStream() (streammux.Stream, error) {
@@ -91,3 +92,5 @@ func (c GarlicConn) AcceptStream() (streammux.Stream, error) {
 	var s streammux.Stream
 	return s, nil
 }
+
+//func NewGarlicConn()
