@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	net "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
-    net "github.com/libp2p/go-libp2p-net"
 	tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
 )

@@ -5,9 +5,9 @@ import (
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	"strings"
 
-    peer "github.com/libp2p/go-libp2p-peer"
-    peerstore "github.com/libp2p/go-libp2p-peerstore"
-    net "github.com/libp2p/go-libp2p-net"
+	net "github.com/libp2p/go-libp2p-net"
+	peer "github.com/libp2p/go-libp2p-peer"
+	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr-net"
@@ -49,32 +49,32 @@ func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
 }
 
 func (d GarlicDialer) ClosePeer(id peer.ID) error {
-    return nil
+	return nil
 }
 
 func (d GarlicDialer) Connectedness(id peer.ID) net.Connectedness {
-    var n net.Connectedness
-    return n
+	var n net.Connectedness
+	return n
 }
 
 func (d GarlicDialer) Conns() []net.Conn {
-    return nil
+	return nil
 }
 
 func (d GarlicDialer) Peers() []peer.ID {
-    return nil
+	return nil
 }
 
 func (d GarlicDialer) Peerstore() peerstore.Peerstore {
-    return nil
+	return nil
 }
 
 func (d GarlicDialer) ConnsToPeer(p peer.ID) []net.Conn {
-    return nil
+	return nil
 }
 
 func (d GarlicDialer) DialPeer(ctx context.Context, p peer.ID) (net.Conn, error) {
-    return nil, nil
+	return nil, nil
 }
 
 func (d *GarlicDialer) DialContext(ctx context.Context, raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
@@ -82,8 +82,8 @@ func (d *GarlicDialer) DialContext(ctx context.Context, raddr i2pma.I2PMultiaddr
 }
 
 func (d GarlicDialer) LocalPeer() peer.ID {
-    var p peer.ID
-    return p
+	var p peer.ID
+	return p
 }
 
 func (d GarlicDialer) Notify(net.Notifiee) {

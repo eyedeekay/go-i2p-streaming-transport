@@ -2,7 +2,7 @@ package ipfsi2pntcp
 
 import (
 	"fmt"
-    "math/rand"
+	"math/rand"
 
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	ma "github.com/multiformats/go-multiaddr"
@@ -26,8 +26,8 @@ func IsValidGarlicMultiAddr(a ma.Multiaddr) bool {
 		return false
 	}
 
-    //kinda crude, but if it's bigger than this it's at least possible that
-    //it's a valid kind of i2p address.
+	//kinda crude, but if it's bigger than this it's at least possible that
+	//it's a valid kind of i2p address.
 	if len(addr) < 30 {
 		fmt.Println(addr)
 		return false
@@ -38,9 +38,9 @@ func IsValidGarlicMultiAddr(a ma.Multiaddr) bool {
 
 // Using random tunnel names to avoid collisions
 func RandTunName() string {
-    b := make([]byte, 12)
-    for i := range b {
-        b[i] = "abcdefghijklmnopqrstuvwxyz"[rand.Intn(len("abcdefghijklmnopqrstuvwxyz"))]
-    }
-    return string(b)
+	b := make([]byte, 12)
+	for i := range b {
+		b[i] = "abcdefghijklmnopqrstuvwxyz"[rand.Intn(len("abcdefghijklmnopqrstuvwxyz"))]
+	}
+	return string(b)
 }
