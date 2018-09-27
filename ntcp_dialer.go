@@ -17,9 +17,11 @@ import (
 // GarlicDialer implements go-libp2p-transport's Dialer interface
 type GarlicDialer struct {
 	garlicConn *GarlicConn
+
 	laddr      *ma.Multiaddr
 	lPrivKey   crypto.PrivKey
 	lPubKey    crypto.PubKey
+
 	transport  *GarlicTransport
 	rPubKey    crypto.PubKey
 }

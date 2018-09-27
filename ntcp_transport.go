@@ -43,7 +43,7 @@ func NewGarlicTransport(SAMAddr, SAMPort, SANPass string, auth *proxy.Auth, keys
 		return nil, err
 	}
 	o.keys = keys
-	o.garlicListener.session, err = conn.NewStreamSession("", *o.keys, sam3.Options_Small)
+	o.garlicListener.session, err = conn.NewStreamSession(RandTunName(), *o.keys, sam3.Options_Small)
 	if err != nil {
 		return nil, err
 	}

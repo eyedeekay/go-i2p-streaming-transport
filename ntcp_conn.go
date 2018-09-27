@@ -55,6 +55,7 @@ func (c GarlicConn) RemoteMultiaddr() ma.Multiaddr {
 	return ma.Multiaddr(c.raddr)
 }
 
+// IsClosed says a connection is close if a session hasn't been opened for now.
 func (c GarlicConn) IsClosed() bool {
 	if c.laddr == nil {
 		return true
@@ -65,32 +66,49 @@ func (c GarlicConn) IsClosed() bool {
 	return false
 }
 
+// LocalPeer returns the local peer.ID used for IPFS
 func (c GarlicConn) LocalPeer() peer.ID {
 	lpeer, _ := peer.IDFromPrivateKey(c.LocalPrivateKey())
 	return lpeer
 }
 
+// LocalPrivateKey returns the local private key used for the peer.ID
 func (c GarlicConn) LocalPrivateKey() crypto.PrivKey {
 	return c.lPrivKey
 }
 
+// RemotePeer returns the remote peer.ID used for IPFS
 func (c GarlicConn) RemotePeer() peer.ID {
 	rpeer, _ := peer.IDFromPublicKey(c.RemotePublicKey())
 	return rpeer
 }
 
+//RemotePublicKey returns the remote public key used for the peer.ID
 func (c GarlicConn) RemotePublicKey() crypto.PubKey {
 	return c.rPubKey
 }
 
+//Read finishes implementing something
+func (c GarlicConn) Read(b []byte) (int, error) {
+	return c.Conn.Read(b)
+}
+
+//Write finishes implementing something
+func (c GarlicConn) Write(b []byte) (int, error) {
+	return c.Conn.Write(b)
+}
+
+// Reset lets us streammux
+func (c GarlicConn) Reset() error {
+	return c.Close()
+}
+
+// OpenStream lets us streammux
 func (c GarlicConn) OpenStream() (streammux.Stream, error) {
-	var s streammux.Stream
-	return s, nil
+	return c, nil
 }
 
+// AcceptStream lets us streammux
 func (c GarlicConn) AcceptStream() (streammux.Stream, error) {
-	var s streammux.Stream
-	return s, nil
+	return c, nil
 }
-
-//func NewGarlicConn()
