@@ -26,20 +26,14 @@ type GarlicConn struct {
 	session   *sam3.StreamSession
 }
 
+// Close ends a SAM session associated with a transport
 func (c GarlicConn) Close() error {
-	return nil
-}
-
-func (c GarlicConn) IsClosed() bool {
-	if c.laddr == nil {
-		return true
-	}
-	return false
-}
-
-func (c GarlicConn) LocalPeer() peer.ID {
-	var p peer.ID
-	return p
+	//c.transport.Close()
+	err := c.session.Close()
+    if err == nil {
+        c.session = nil
+    }
+	return err
 }
 
 // Transport returns the GarlicTransport associated
@@ -53,14 +47,29 @@ func (c GarlicConn) LocalMultiaddr() ma.Multiaddr {
 	return *c.laddr
 }
 
-func (c GarlicConn) LocalPrivateKey() crypto.PrivKey {
-	var pk crypto.PrivKey
-	return pk
-}
-
 // RemoteMultiaddr returns the remote multiaddr for this connection
 func (c GarlicConn) RemoteMultiaddr() ma.Multiaddr {
 	return ma.Multiaddr(c.raddr)
+}
+
+func (c GarlicConn) IsClosed() bool {
+	if c.laddr == nil {
+		return true
+	}
+	if c.session == nil {
+		return true
+	}
+	return false
+}
+
+func (c GarlicConn) LocalPeer() peer.ID {
+	var p peer.ID
+	return p
+}
+
+func (c GarlicConn) LocalPrivateKey() crypto.PrivKey {
+	var pk crypto.PrivKey
+	return pk
 }
 
 func (c GarlicConn) RemotePeer() peer.ID {
