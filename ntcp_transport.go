@@ -50,22 +50,22 @@ func NewGarlicTransport(SAMAddr, SAMPort, SANPass string, auth *proxy.Auth, keys
 	return &o, nil
 }
 
-func (t *GarlicTransport) CanDial(m ma.Multiaddr) bool {
+func (t GarlicTransport) CanDial(m ma.Multiaddr) bool {
 	return t.garlicDialer.Matches(m)
 }
 
-func (t *GarlicTransport) Dial(c context.Context, m ma.Multiaddr, p peer.ID) (tpt.Conn, error) {
+func (t GarlicTransport) Dial(c context.Context, m ma.Multiaddr, p peer.ID) (tpt.Conn, error) {
 	var conn GarlicConn
 	return conn, nil
 }
 
 // Protocols need only return this I think
-func (t *GarlicTransport) Protocols() []int {
+func (t GarlicTransport) Protocols() []int {
 	return []int{i2pma.P_GARLIC_NTCP}
 }
 
 // Proxy always returns false, we're using the SAM bridge to make our requests
-func (t *GarlicTransport) Proxy() bool {
+func (t GarlicTransport) Proxy() bool {
 	return false
 }
 
@@ -112,7 +112,7 @@ func (t *GarlicTransport) Dialer(laddr ma.Multiaddr) (net.Dialer, error) {
 }
 
 // Listen creates and returns a go-libp2p-transport Listener
-func (t *GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
+func (t GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
 
 	garlicAddr, err := i2pma.NewI2PMultiaddr(t.keys.String())
 	if err != nil {
@@ -129,7 +129,7 @@ func (t *GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
 		laddr:     laddr,
 		lPrivKey:  sk,
 		lPubKey:   pk,
-		transport: t,
+		transport: &t,
 	}
 
 	listener.session, err = t.SAMConn.NewStreamSession(RandTunName(), *t.keys, sam3.Options_Medium)

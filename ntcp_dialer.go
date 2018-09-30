@@ -37,13 +37,16 @@ func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
 			return nil, err
 		}
 	}
-	garlicConn := GarlicConn{
-		transport: tpt.Transport(d.transport),
-		laddr:     d.laddr,
-		lPrivKey:  d.lPrivKey,
-		lPubKey:   d.lPubKey,
-		raddr:     raddr,
-		rPubKey:   d.rPubKey,
+	garlicConn, err := NewGarlicConn(
+		tpt.Transport(d.transport),
+		d.laddr,
+		d.lPrivKey,
+		d.lPubKey,
+		raddr,
+		d.rPubKey,
+	)
+	if err != nil {
+		return nil, err
 	}
 	if garlicAddress != "" {
 		split := strings.Split(garlicAddress, ":")

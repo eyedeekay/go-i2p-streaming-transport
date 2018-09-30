@@ -11,7 +11,7 @@ import (
 // IsValidGarlicMultiAddr is used to validate that a multiaddr
 // is representing a I2P garlic service
 func IsValidGarlicMultiAddr(a ma.Multiaddr) bool {
-	if len(a.Protocols()) != 1 {
+	if len(a.Protocols()) < 2 {
 		return false
 	}
 

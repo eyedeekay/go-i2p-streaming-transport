@@ -112,3 +112,15 @@ func (c GarlicConn) OpenStream() (streammux.Stream, error) {
 func (c GarlicConn) AcceptStream() (streammux.Stream, error) {
 	return c, nil
 }
+
+func NewGarlicConn(transport tpt.Transport, laddr *ma.Multiaddr, lPrivKey crypto.PrivKey, lPubKey crypto.PubKey, raddr i2pma.I2PMultiaddr, rPubKey crypto.PubKey) (GarlicConn, error) {
+	garlicConn := GarlicConn{
+		transport: transport,
+		laddr:     laddr,
+		lPrivKey:  lPrivKey,
+		lPubKey:   lPubKey,
+		raddr:     raddr,
+		rPubKey:   rPubKey,
+	}
+	return garlicConn, nil
+}

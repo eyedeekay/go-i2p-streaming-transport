@@ -3,21 +3,23 @@ package ipfsi2pntcp
 import (
 	"github.com/eyedeekay/sam3"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
+	"log"
 	"testing"
 )
 
-func TestNTCPConn(t *testing.T) {
+func TestNTCPTransport(t *testing.T) {
 	// Test valid
 	key, err := createEepServiceKey()
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	validAddr, err := i2pma.NewI2PMultiaddr("/ntcp/" + key.String())
 	if err != nil {
 		t.Fatal(err)
 	}
-	valid := IsValidGarlicMultiAddr(validAddr)
-	if !valid {
+
+	if valid := IsValidGarlicMultiAddr(validAddr); !valid {
 		t.Fatal("IsValidMultiAddr failed")
 	}
 
@@ -26,10 +28,24 @@ func TestNTCPConn(t *testing.T) {
 	if err == nil {
 		t.Fatal(err)
 	}
-	valid = IsValidGarlicMultiAddr(invalidAddr)
-	if valid {
+
+	if valid := IsValidGarlicMultiAddr(invalidAddr); valid {
 		t.Fatal("IsValidMultiAddr failed")
 	}
+
+	if addr, err := validAddr.ValueForProtocol(i2pma.P_GARLIC_NTCP); err != nil {
+		t.Fatal(err)
+	} else {
+		log.Println(addr)
+	}
+
+	if addr, err := validAddr.ValueForProtocol(i2pma.P_GARLIC_NTCP); err != nil {
+		t.Fatal(err)
+	} else {
+		log.Println(addr)
+	}
+
+	//NewGarlicTransport()
 }
 
 func createEepServiceKey() (*sam3.I2PKeys, error) {
