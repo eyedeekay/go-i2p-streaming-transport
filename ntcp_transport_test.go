@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestNTCPTransport(t *testing.T) {
+func TestGarlicTransport(t *testing.T) {
 	// Test valid
 	key, err := createEepServiceKey()
 	if err != nil {

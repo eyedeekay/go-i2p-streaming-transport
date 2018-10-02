@@ -3,7 +3,7 @@ package ipfsi2pntcp
 import (
 	"context"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
-	"strings"
+	//"strings"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
 	net "github.com/libp2p/go-libp2p-net"
@@ -11,7 +11,7 @@ import (
 	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
-	manet "github.com/multiformats/go-multiaddr-net"
+	//manet "github.com/multiformats/go-multiaddr-net"
 )
 
 // GarlicDialer implements go-libp2p-transport's Dialer interface
@@ -29,14 +29,6 @@ type GarlicDialer struct {
 // Dial connects to the specified multiaddr and returns
 // a go-libp2p-transport Conn interface
 func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
-	netaddr, err := manet.ToNetAddr(raddr)
-	var garlicAddress string
-	if err != nil {
-		garlicAddress, err = raddr.ValueForProtocol(ma.P_ONION)
-		if err != nil {
-			return nil, err
-		}
-	}
 	garlicConn, err := NewGarlicConn(
 		tpt.Transport(d.transport),
 		d.laddr,
@@ -48,12 +40,7 @@ func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	if garlicAddress != "" {
-		split := strings.Split(garlicAddress, ":")
-		garlicConn.Conn, err = d.transport.garlicDialer.garlicConn.session.Dial("ntcp", split[0]+".b32.i2p:"+split[1])
-	} else {
-		garlicConn.Conn, err = d.transport.garlicDialer.garlicConn.session.Dial(netaddr.Network(), raddr.I2PAddr.Base32())
-	}
+	garlicConn.Conn, err = d.transport.garlicDialer.garlicConn.session.Dial("ntcp", raddr.I2PAddr.Base32())
 	if err != nil {
 		return nil, err
 	}
