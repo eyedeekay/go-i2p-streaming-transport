@@ -1,8 +1,6 @@
 
 #GOPATH=$(PWD)/.go
 
-#PATH+=$(GOPATH)/bin
-
 echo:
 	@echo $(GOPATH)
 
