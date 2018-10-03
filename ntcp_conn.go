@@ -122,5 +122,17 @@ func NewGarlicConn(transport tpt.Transport, laddr *ma.Multiaddr, lPrivKey crypto
 		raddr:     raddr,
 		rPubKey:   rPubKey,
 	}
+	conn, err := sam3.NewSAM(raddr.SAMAddressString())
+	if err != nil {
+		return garlicConn, nil
+	}
+	keys, err := conn.NewKeys()
+	if err != nil {
+		return garlicConn, nil
+	}
+	garlicConn.session, err = conn.NewStreamSession(RandTunName(), keys, sam3.Options_Small)
+	if err != nil {
+		return garlicConn, nil
+	}
 	return garlicConn, nil
 }

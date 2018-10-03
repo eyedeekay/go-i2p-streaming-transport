@@ -2,8 +2,8 @@ package ipfsi2pntcp
 
 import (
 	"context"
+	"crypto/rand"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
-	//"strings"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
 	net "github.com/libp2p/go-libp2p-net"
@@ -11,7 +11,6 @@ import (
 	peerstore "github.com/libp2p/go-libp2p-peerstore"
 	tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
-	//manet "github.com/multiformats/go-multiaddr-net"
 )
 
 // GarlicDialer implements go-libp2p-transport's Dialer interface
@@ -95,4 +94,18 @@ func (d GarlicDialer) StopNotify(net.Notifiee) {
 
 func (d *GarlicDialer) Matches(a ma.Multiaddr) bool {
 	return IsValidGarlicMultiAddr(a)
+}
+
+func NewGarlicDialer(t *GarlicTransport, laddr ma.Multiaddr) (*GarlicDialer, error) {
+	sk, pk, err := crypto.GenerateEd25519Key(rand.Reader)
+	if err != nil {
+		return nil, err
+	}
+	g := &GarlicDialer{
+		transport: t,
+		lPrivKey:  sk,
+		lPubKey:   pk,
+		laddr:     &laddr,
+	}
+	return g, nil
 }

@@ -14,7 +14,7 @@ func TestGarlicTransport(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	validAddr, err := i2pma.NewI2PMultiaddr("/ntcp/" + key.String())
+	validAddr, err := i2pma.NewI2PMultiaddr("/ntcp/"+key.String(), true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func TestGarlicTransport(t *testing.T) {
 	}
 
 	// Test wrong protocol
-	invalidAddr, err := i2pma.NewI2PMultiaddr("/ip4/0.0.0.0/tcp/4001")
+	invalidAddr, err := i2pma.NewI2PMultiaddr("/ip4/0.0.0.0/tcp/4001", true)
 	if err == nil {
 		t.Fatal(err)
 	}

@@ -69,3 +69,8 @@ func (l *GarlicListener) Addr() net.Addr {
 func (l *GarlicListener) Multiaddr() ma.Multiaddr {
 	return l.laddr
 }
+
+// NewGarlicListener
+func NewGarlicListener() (*GarlicListener, error) {
+	return nil, nil
+}
