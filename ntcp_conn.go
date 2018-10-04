@@ -4,7 +4,6 @@ import (
 	"github.com/eyedeekay/sam3"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	"github.com/libp2p/go-stream-muxer"
-	"io"
 	"net"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
@@ -16,11 +15,11 @@ import (
 // GarlicConn implement's go-libp2p-transport's Conn interface
 type GarlicConn struct {
 	net.Conn
-	io.Reader
-	io.Writer
-	io.Closer
+	//io.Reader
+	//io.Writer
+	//io.Closer
 
-	transport tpt.Transport
+	transport *GarlicTransport
 	laddr     *ma.Multiaddr
 	lPrivKey  crypto.PrivKey
 	lPubKey   crypto.PubKey
@@ -113,9 +112,9 @@ func (c GarlicConn) AcceptStream() (streammux.Stream, error) {
 	return c, nil
 }
 
-func NewGarlicConn(transport tpt.Transport, laddr *ma.Multiaddr, lPrivKey crypto.PrivKey, lPubKey crypto.PubKey, raddr i2pma.I2PMultiaddr, rPubKey crypto.PubKey) (GarlicConn, error) {
+func NewGarlicConn(t *GarlicTransport, laddr *ma.Multiaddr, lPrivKey crypto.PrivKey, lPubKey crypto.PubKey, raddr i2pma.I2PMultiaddr, rPubKey crypto.PubKey) (GarlicConn, error) {
 	garlicConn := GarlicConn{
-		transport: transport,
+		transport: t,
 		laddr:     laddr,
 		lPrivKey:  lPrivKey,
 		lPubKey:   lPubKey,

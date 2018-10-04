@@ -1,8 +1,10 @@
 package ipfsi2pntcp
 
 import (
+	"crypto/rand"
 	"github.com/eyedeekay/sam3"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
+	"log"
 	"net"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
@@ -71,6 +73,22 @@ func (l *GarlicListener) Multiaddr() ma.Multiaddr {
 }
 
 // NewGarlicListener
-func NewGarlicListener() (*GarlicListener, error) {
-	return nil, nil
+func NewGarlicListener(t *GarlicTransport, key sam3.I2PKeys, laddr ma.Multiaddr) (*GarlicListener, error) {
+	sk, pk, err := crypto.GenerateEd25519Key(rand.Reader)
+	if err != nil {
+		return nil, err
+	}
+	garlicAddr, err := i2pma.NewI2PMultiaddr("/ntcp/"+key.String(), true)
+	if err != nil {
+		log.Println(" \n  ", garlicAddr.String(), " \n  ")
+		return nil, err
+	}
+	g := &GarlicListener{
+		key:       garlicAddr,
+		laddr:     laddr,
+		lPrivKey:  sk,
+		lPubKey:   pk,
+		transport: t,
+	}
+	return g, nil
 }

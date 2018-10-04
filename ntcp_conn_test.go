@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
-	tpt "github.com/libp2p/go-libp2p-transport"
+	//tpt "github.com/libp2p/go-libp2p-transport"
 	ma "github.com/multiformats/go-multiaddr"
 )
 
 func TestGarlicConn(t *testing.T) {
+	log.Println("\n+++ Testing ntcp_conn.go\n ")
 	k, e := createEepServiceKey()
 	if e != nil {
 		log.Println(e)
@@ -26,10 +27,10 @@ func TestGarlicConn(t *testing.T) {
 	var lPubKey crypto.PubKey
 	var rPubKey crypto.PubKey
 	var laddr ma.Multiaddr
-	var transport GarlicTransport
+	var transport *GarlicTransport
 
 	garlicConn, err := NewGarlicConn(
-		tpt.Transport(transport),
+		transport,
 		&laddr,
 		lPrivKey,
 		lPubKey,
@@ -39,5 +40,5 @@ func TestGarlicConn(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println(garlicConn.IsClosed())
+	log.Println(garlicConn.IsClosed(), "\n ")
 }

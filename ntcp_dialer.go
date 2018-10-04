@@ -15,35 +15,10 @@ import (
 
 // GarlicDialer implements go-libp2p-transport's Dialer interface
 type GarlicDialer struct {
-	garlicConn *GarlicConn
+	GarlicConn
 
-	laddr    *ma.Multiaddr
-	lPrivKey crypto.PrivKey
-	lPubKey  crypto.PubKey
-
-	transport *GarlicTransport
-	rPubKey   crypto.PubKey
-}
-
-// Dial connects to the specified multiaddr and returns
-// a go-libp2p-transport Conn interface
-func (d *GarlicDialer) Dial(raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
-	garlicConn, err := NewGarlicConn(
-		tpt.Transport(d.transport),
-		d.laddr,
-		d.lPrivKey,
-		d.lPubKey,
-		raddr,
-		d.rPubKey,
-	)
-	if err != nil {
-		return nil, err
-	}
-	garlicConn.Conn, err = d.transport.garlicDialer.garlicConn.session.Dial("ntcp", raddr.I2PAddr.Base32())
-	if err != nil {
-		return nil, err
-	}
-	return &garlicConn, nil
+	//transport *GarlicTransport
+	rPubKey crypto.PubKey
 }
 
 func (d GarlicDialer) ClosePeer(id peer.ID) error {
@@ -75,8 +50,24 @@ func (d GarlicDialer) DialPeer(ctx context.Context, p peer.ID) (net.Conn, error)
 	return nil, nil
 }
 
-func (d *GarlicDialer) DialContext(ctx context.Context, raddr i2pma.I2PMultiaddr) (tpt.Conn, error) {
-	return d.Dial(raddr)
+func (d *GarlicDialer) Dial(ctx context.Context, raddr i2pma.I2PMultiaddr, p peer.ID) (tpt.Conn, error) {
+	var err error
+	d.GarlicConn, err = NewGarlicConn(
+		d.GarlicConn.transport,
+		d.laddr,
+		d.lPrivKey,
+		d.lPubKey,
+		raddr,
+		d.rPubKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	d.GarlicConn.Conn, err = d.session.Dial("ntcp", raddr.I2PAddr.Base32())
+	if err != nil {
+		return nil, err
+	}
+	return &d.GarlicConn, nil
 }
 
 func (d GarlicDialer) LocalPeer() peer.ID {
@@ -93,19 +84,24 @@ func (d GarlicDialer) StopNotify(net.Notifiee) {
 }
 
 func (d *GarlicDialer) Matches(a ma.Multiaddr) bool {
+	return IsValidGarlicMultiAddr(a.(i2pma.I2PMultiaddr))
+}
+
+func (d *GarlicDialer) MatchesI2P(a i2pma.I2PMultiaddr) bool {
 	return IsValidGarlicMultiAddr(a)
 }
 
-func NewGarlicDialer(t *GarlicTransport, laddr ma.Multiaddr) (*GarlicDialer, error) {
+func NewGarlicDialer(t *GarlicTransport, laddr ma.Multiaddr, raddr i2pma.I2PMultiaddr) (*GarlicDialer, error) {
 	sk, pk, err := crypto.GenerateEd25519Key(rand.Reader)
 	if err != nil {
 		return nil, err
 	}
+	garlicConn, err := NewGarlicConn(t, &laddr, sk, pk, raddr, pk)
+	if err != nil {
+		return nil, err
+	}
 	g := &GarlicDialer{
-		transport: t,
-		lPrivKey:  sk,
-		lPubKey:   pk,
-		laddr:     &laddr,
+		GarlicConn: garlicConn,
 	}
 	return g, nil
 }
