@@ -17,7 +17,7 @@ func TestGarlicConn(t *testing.T) {
 		log.Println(e)
 		t.Fatal(e.Error())
 	}
-	raddr, e := i2pma.NewI2PMultiaddr("/ntcp/"+k.String(), true)
+	raddr, e := i2pma.NewI2PMultiaddr("/ntcp/"+k.String(), true, "/sam/127.0.0.1:7657")
 	if e != nil {
 		t.Fatal(e.Error())
 	}

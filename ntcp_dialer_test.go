@@ -10,19 +10,24 @@ import (
 
 func TestGarlicDialer(t *testing.T) {
 	log.Println("\n+++ Testing ntcp_dialer.go\n ")
-	var laddr ma.Multiaddr
-	if transport, err := NewGarlicTransport("127.0.0.1", "7656", "", "", true); err != nil {
+	laddr, err := ma.NewMultiaddr("/ip4/127.0.0.1/tcp/7899")
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println(laddr.String())
+	if transport, err := NewGarlicTransport("127.0.0.1", "7657", "", "", true); err != nil {
 		t.Fatal(err)
 	} else {
-		raddr, err := i2pma.NewI2PMultiaddr("/ntcp/"+transport.keys.String(), true)
+		log.Println("transport generated")
+		raddr, err := i2pma.NewI2PMultiaddr("/ntcp/"+transport.I2PKeys.String(), true, "/sam/127.0.0.1:7657")
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println(transport.keys.Addr().Base32())
+		log.Println(raddr.String(), transport.I2PKeys.Addr().Base32())
 		dialer, err := NewGarlicDialer(transport, laddr, raddr)
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println(dialer.GarlicConn.raddr.String(), "\n ")
+		log.Println(dialer.GarlicConn.I2PMultiaddr.String(), "\n ")
 	}
 }

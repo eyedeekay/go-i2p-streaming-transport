@@ -4,6 +4,7 @@ import (
 	"github.com/eyedeekay/sam3"
 	i2pma "github.com/eyedeekay/sam3-multiaddr"
 	"github.com/libp2p/go-stream-muxer"
+	"log"
 	"net"
 
 	crypto "github.com/libp2p/go-libp2p-crypto"
@@ -15,25 +16,23 @@ import (
 // GarlicConn implement's go-libp2p-transport's Conn interface
 type GarlicConn struct {
 	net.Conn
-	//io.Reader
-	//io.Writer
-	//io.Closer
+	i2pma.I2PMultiaddr
+	*sam3.StreamSession
+	*GarlicTransport
 
-	transport *GarlicTransport
-	laddr     *ma.Multiaddr
-	lPrivKey  crypto.PrivKey
-	lPubKey   crypto.PubKey
+	laddr    *ma.Multiaddr
+	lPrivKey crypto.PrivKey
+	lPubKey  crypto.PubKey
 
-	raddr   i2pma.I2PMultiaddr
 	rPubKey crypto.PubKey
-	session *sam3.StreamSession
+	//session *sam3.StreamSession
 }
 
 // Close ends a SAM session associated with a transport
 func (c GarlicConn) Close() error {
-	err := c.session.Close()
+	err := c.StreamSession.Close()
 	if err == nil {
-		c.session = nil
+		c.StreamSession = nil
 	}
 	return err
 }
@@ -41,7 +40,7 @@ func (c GarlicConn) Close() error {
 // Transport returns the GarlicTransport associated
 // with this GarlicConn
 func (c GarlicConn) Transport() tpt.Transport {
-	return c.transport
+	return c.GarlicTransport
 }
 
 // LocalMultiaddr returns the local multiaddr for this connection
@@ -51,7 +50,7 @@ func (c GarlicConn) LocalMultiaddr() ma.Multiaddr {
 
 // RemoteMultiaddr returns the remote multiaddr for this connection
 func (c GarlicConn) RemoteMultiaddr() ma.Multiaddr {
-	return ma.Multiaddr(c.raddr)
+	return ma.Multiaddr(c.I2PMultiaddr)
 }
 
 // IsClosed says a connection is close if a session hasn't been opened for now.
@@ -59,7 +58,7 @@ func (c GarlicConn) IsClosed() bool {
 	if c.laddr == nil {
 		return true
 	}
-	if c.session == nil {
+	if c.StreamSession == nil {
 		return true
 	}
 	return false
@@ -113,13 +112,15 @@ func (c GarlicConn) AcceptStream() (streammux.Stream, error) {
 }
 
 func NewGarlicConn(t *GarlicTransport, laddr *ma.Multiaddr, lPrivKey crypto.PrivKey, lPubKey crypto.PubKey, raddr i2pma.I2PMultiaddr, rPubKey crypto.PubKey) (GarlicConn, error) {
+	name := RandTunName()
+	log.Println("Creating a new GarlicConn", name)
 	garlicConn := GarlicConn{
-		transport: t,
-		laddr:     laddr,
-		lPrivKey:  lPrivKey,
-		lPubKey:   lPubKey,
-		raddr:     raddr,
-		rPubKey:   rPubKey,
+		GarlicTransport: t,
+		laddr:           laddr,
+		lPrivKey:        lPrivKey,
+		lPubKey:         lPubKey,
+		I2PMultiaddr:    raddr,
+		rPubKey:         rPubKey,
 	}
 	conn, err := sam3.NewSAM(raddr.SAMAddressString())
 	if err != nil {
@@ -129,7 +130,7 @@ func NewGarlicConn(t *GarlicTransport, laddr *ma.Multiaddr, lPrivKey crypto.Priv
 	if err != nil {
 		return garlicConn, nil
 	}
-	garlicConn.session, err = conn.NewStreamSession(RandTunName(), keys, sam3.Options_Small)
+	garlicConn.StreamSession, err = conn.NewStreamSession(name, keys, sam3.Options_Small)
 	if err != nil {
 		return garlicConn, nil
 	}

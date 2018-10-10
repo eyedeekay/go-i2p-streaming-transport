@@ -17,7 +17,6 @@ import (
 type GarlicDialer struct {
 	GarlicConn
 
-	//transport *GarlicTransport
 	rPubKey crypto.PubKey
 }
 
@@ -53,7 +52,7 @@ func (d GarlicDialer) DialPeer(ctx context.Context, p peer.ID) (net.Conn, error)
 func (d *GarlicDialer) Dial(ctx context.Context, raddr i2pma.I2PMultiaddr, p peer.ID) (tpt.Conn, error) {
 	var err error
 	d.GarlicConn, err = NewGarlicConn(
-		d.GarlicConn.transport,
+		d.GarlicConn.GarlicTransport,
 		d.laddr,
 		d.lPrivKey,
 		d.lPubKey,
@@ -63,7 +62,7 @@ func (d *GarlicDialer) Dial(ctx context.Context, raddr i2pma.I2PMultiaddr, p pee
 	if err != nil {
 		return nil, err
 	}
-	d.GarlicConn.Conn, err = d.session.Dial("ntcp", raddr.I2PAddr.Base32())
+	d.GarlicConn.Conn, err = d.StreamSession.Dial("ntcp", raddr.I2PAddr.Base32())
 	if err != nil {
 		return nil, err
 	}

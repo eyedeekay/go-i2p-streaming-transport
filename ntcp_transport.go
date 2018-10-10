@@ -17,11 +17,12 @@ import (
 // GarlicTransport implements go-libp2p-transport's Transport interface
 type GarlicTransport struct {
 	*sam3.SAM
+	*sam3.I2PKeys
 	*GarlicListener
 	*GarlicDialer
+	SAMAddr string
 
-	keysDir string
-	keys    *sam3.I2PKeys
+	keysPath string
 }
 
 func (t GarlicTransport) CanDial(m ma.Multiaddr) bool {
@@ -49,32 +50,23 @@ func (t GarlicTransport) Proxy() bool {
 
 // Dialer creates and returns a go-libp2p-transport Dialer
 func (t GarlicTransport) Dialer(laddr ma.Multiaddr) (net.Dialer, error) {
-	dialer, err := NewGarlicDialer(&t, laddr, t.GarlicDialer.raddr)
+	var err error
+	t.GarlicDialer, err = NewGarlicDialer(&t, laddr, t.GarlicDialer.I2PMultiaddr)
 	if err != nil {
 		return nil, err
 	}
-	return dialer, nil
+	return t.GarlicDialer, nil
 }
 
 // Listen creates and returns a go-libp2p-transport Listener
 func (t GarlicTransport) Listen(laddr ma.Multiaddr) (tpt.Listener, error) {
-
-	listener, err := NewGarlicListener(&t, *t.keys, laddr)
+	var err error
+	//name := RandTunName()
+	t.GarlicListener, err = NewGarlicListener(&t, *t.I2PKeys, laddr)
 	if err != nil {
 		return nil, err
 	}
-
-	listener.session, err = t.SAM.NewStreamSession(RandTunName(), *t.keys, sam3.Options_Medium)
-	if err != nil {
-		return nil, err
-	}
-
-	listener.StreamListener, err = listener.session.Listen()
-	if err != nil {
-		return nil, err
-	}
-
-	return listener, nil
+	return t.GarlicListener.Listen()
 }
 
 // Matches returns true if the address is a valid onion multiaddr
@@ -83,8 +75,8 @@ func (t *GarlicTransport) Matches(a i2pma.I2PMultiaddr) bool {
 }
 
 // loadKeys loads keys into our keys from files in the keys directory
-func LoadKeys(keysDir string) (*sam3.I2PKeys, error) {
-	absPath, err := filepath.EvalSymlinks(keysDir)
+func LoadKeys(keysPath string) (*sam3.I2PKeys, error) {
+	absPath, err := filepath.EvalSymlinks(keysPath)
 	if err != nil {
 		return nil, err
 	}
@@ -105,31 +97,22 @@ func LoadKeys(keysDir string) (*sam3.I2PKeys, error) {
 }
 
 // NewGarlicTransport initializes a GarlicTransport for libp2p
-func NewGarlicTransport(SAMAddr, SAMPort, SANPass string, keysDir string, onlyGarlic bool) (*GarlicTransport, error) {
+func NewGarlicTransport(SAMAddr, SAMPort, SANPass string, keysPath string, onlyGarlic bool) (*GarlicTransport, error) {
 	conn, err := sam3.NewSAM(SAMAddr + ":" + SAMPort)
 	if err != nil {
 		return nil, err
 	}
-	keys, err := LoadKeys(keysDir)
+	keys, err := LoadKeys(keysPath)
+	if err != nil {
+		return nil, err
+	}
 	g := GarlicTransport{
+		SAMAddr:        "/sam/" + SAMAddr + ":" + SAMPort,
 		SAM:            conn,
-		keysDir:        keysDir,
-		keys:           keys,
+		I2PKeys:        keys,
 		GarlicListener: &GarlicListener{},
 		GarlicDialer:   &GarlicDialer{},
-	}
-	var laddr ma.Multiaddr
-	g.GarlicListener, err = NewGarlicListener(&g, *g.keys, laddr)
-	if err != nil {
-		return nil, err
-	}
-	//garlicDialer, err := NewGarlicDialer()
-	if err != nil {
-		return nil, err
-	}
-	g.GarlicListener.session, err = conn.NewStreamSession(RandTunName(), *g.keys, sam3.Options_Small)
-	if err != nil {
-		return nil, err
+		keysPath:       keysPath,
 	}
 	return &g, nil
 }
