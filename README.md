@@ -1,5 +1,5 @@
-NTCP Transport for libp2p
--------------------------
+i2p Streaming Transport for libp2p
+----------------------------------
 
-Doesn't work yet. Probably Monday or so depending on how much crap I get
-this weekend at work. (It was alot).
+Don't use this one. A better version which is consistent with the rest of libp2p
+is nearly ready.
